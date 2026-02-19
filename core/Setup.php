@@ -2,8 +2,8 @@
 
 $basePath = __DIR__ . '/..';
 
-// storage folders (create first so keys dir exists before generate:key)
-$dirs = ['storage/logs','storage/cache','storage/uploads','storage/keys','storage/public','storage/private','database/migrations'];
+// storage + database folders (create at project creation)
+$dirs = ['storage/logs','storage/cache','storage/uploads','storage/keys','storage/public','storage/private','database','database/migrations'];
 foreach ($dirs as $dir) {
     if (!is_dir($basePath . '/' . $dir)) {
         mkdir($basePath . '/' . $dir, 0777, true);
@@ -23,6 +23,13 @@ if (!file_exists($envFile) && file_exists($envExample)) {
 }
 
 // when .env is newly created, run generate:key to save encrypted APP_KEY to both .env and storage
+$keyGenerated = false;
 if ($envJustCreated) {
-    passthru('php ' . escapeshellarg($basePath . '/larahub') . ' generate:key');
+    $returnVar = 0;
+    passthru('php ' . escapeshellarg($basePath . '/larahub') . ' generate:key', $returnVar);
+    $keyGenerated = ($returnVar === 0);
+}
+
+if ($keyGenerated) {
+    echo "\n✅ Project created successfully!\n";
 }

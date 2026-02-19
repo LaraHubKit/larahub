@@ -32,15 +32,14 @@ switch ($cmd) {
         break;
 
     case 'migrate':
-        $files = glob(__DIR__.'/database/migrations/*.php') ?: [];
-        sort($files);
-        foreach ($files as $file) {
-            $migration = require $file;
-            if (is_object($migration) && method_exists($migration, 'up')) {
-                $migration->up();
-            }
-        }
-        echo "✅ Migrations done\n";
+        $migrator = new \Core\Migrator(__DIR__);
+        $count = $migrator->migrate();
+        echo "✅ Migrations done ({$count} run)\n";
+        break;
+
+    case 'migrate:fresh':
+        $migrator = new \Core\Migrator(__DIR__);
+        $migrator->migrateFresh();
         break;
 
     case 'make:model':
@@ -103,6 +102,7 @@ switch ($cmd) {
         echo "LaraHub CLI\n";
         echo "php larahub run\n";
         echo "php larahub migrate\n";
+        echo "php larahub migrate:fresh\n";
         echo "php larahub make:controller Name\n";
         echo "php larahub make:model Name [-m] [-b=users] [--no-blameable]\n";
         echo "php larahub generate:key\n";

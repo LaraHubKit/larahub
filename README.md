@@ -1,108 +1,92 @@
 # LaraHub
 
-A lightweight PHP framework for building small to medium web applications. Built with simplicity and developer experience in mind.
+A simple PHP framework for small to medium web apps. Easy to learn and quick to build with.
 
 ---
 
-## Requirements
+## What You Need
 
-- **PHP** 8.1 or higher
-- **Composer**
-- **MySQL** (or compatible database)
+- PHP 8.1+
+- Composer
+- MySQL (or compatible)
 
 ---
 
-## Installation
+## Get Started (3 Steps)
+
+### 1. Create your project
 
 ```bash
-# Clone or download the framework
-composer install
-
-# Configure environment
-cp .env.example .env
-# Edit .env with your database credentials and settings
-
-# Generate application key (required before running)
-php larahub generate:key
+composer create-project larahub/larahub my-app
+cd my-app
 ```
 
-Setup runs automatically on `composer install` and will:
-- Copy `.env.example` to `.env` if missing
-- Generate `APP_KEY` if not set
-- Create `storage/logs`, `storage/cache`, `storage/uploads`, and `storage/keys`
+Setup runs automatically: creates folders, copies `.env`, generates `APP_KEY`.
 
----
+### 2. Configure database
 
-## Quick Start
+Edit `.env` and set your database details:
+
+```
+DB_HOST=127.0.0.1
+DB_NAME=your_database
+DB_USER=your_user
+DB_PASS=your_password
+```
+
+### 3. Run it
 
 ```bash
-# Start development server
-php larahub run
+php larahub migrate    # Run migrations (first time)
+php larahub run        # Start server
 ```
 
 Open **http://localhost:8000** in your browser.
 
 ---
 
-## Project Structure
+## CLI Commands
 
-```
-framework/
-├── app/
-│   ├── Controllers/     # HTTP controllers
-│   ├── Models/          # Eloquent models
-│   └── Middlewares/     # Route middleware
-├── bootstrap/
-│   └── app.php          # Application bootstrap
-├── core/                # Framework core
-│   ├── Router.php       # Request routing
-│   ├── Controller.php   # Base controller
-│   ├── ErrorHandler.php # Error & exception handling
-│   ├── Security.php     # CSRF, escaping
-│   ├── AppKey.php       # Encrypted key management
-│   ├── MakeModel.php    # Model & migration generator
-│   └── Setup.php        # Initial setup
-├── database/
-│   └── migrations/      # Database migrations
-├── public/
-│   └── index.php        # Web entry point
-├── routes/
-│   ├── web.php          # Web routes
-│   └── api.php          # API routes
-├── storage/             # Logs, cache, uploads, keys
-├── views/               # View templates
-└── larahub              # CLI entry point
-```
+| Command | What it does |
+|---------|--------------|
+| `php larahub run` | Start dev server |
+| `php larahub migrate` | Run migrations |
+| `php larahub migrate:fresh` | Drop tables and re-run migrations |
+| `php larahub make:controller Name` | Create a controller |
+| `php larahub make:model Name` | Create a model |
+| `php larahub make:model Name -m` | Create model + migration |
+| `php larahub make:model Name -m -b=users` | Model + migration + blameable (created_by, updated_by) |
+| `php larahub generate:key` | Generate new APP_KEY |
 
 ---
 
-## CLI Commands
+## Project Structure
 
-| Command | Description |
-|---------|-------------|
-| `php larahub run` | Start built-in dev server on `http://localhost:8000` |
-| `php larahub migrate` | Run all database migrations |
-| `php larahub make:controller Name` | Create a new controller |
-| `php larahub make:model Name` | Create a new model |
-| `php larahub make:model Name -m` | Create model with migration |
-| `php larahub make:model Name -m -b=users` | With migration + blameable columns |
-| `php larahub make:model Name -m --no-blameable` | Model + migration, no blameable |
-| `php larahub generate:key` | Generate or regenerate `APP_KEY` |
+```
+my-app/
+├── app/
+│   ├── Controllers/    # Your controllers
+│   ├── Models/         # Eloquent models
+│   └── Middlewares/    # Route middleware
+├── database/migrations/ # Database migrations
+├── public/             # Web root (index.php)
+├── routes/
+│   ├── web.php        # Web routes
+│   └── api.php        # API routes
+├── storage/           # Logs, cache, uploads, keys
+├── views/             # HTML templates
+└── larahub            # CLI tool
+```
 
 ---
 
 ## Routing
 
-Define routes in `routes/web.php` and `routes/api.php`:
+Add routes in `routes/web.php`:
 
 ```php
-// GET route
 $router->get('/about', [\App\Controllers\AboutController::class, 'index']);
-
-// POST route
 $router->post('/contact', [\App\Controllers\ContactController::class, 'submit']);
-
-// With middleware
 $router->get('/dashboard', [\App\Controllers\DashboardController::class, 'index'], ['AuthMiddleware']);
 ```
 
@@ -110,7 +94,7 @@ $router->get('/dashboard', [\App\Controllers\DashboardController::class, 'index'
 
 ## Controllers
 
-Extend `Core\Controller` and return view output or JSON:
+Extend `Core\Controller`:
 
 ```php
 <?php
@@ -137,13 +121,13 @@ class HomeController extends Controller
 
 ## Views
 
-Views live in `views/` as `.php` files. Pass data via the second argument of `view()`:
+Views are PHP files in `views/`. Use dots for subfolders: `users.profile` → `views/users/profile.php`.
 
 ```php
-return $this->view('users.profile', ['user' => $user]);
+return $this->view('home', ['user' => $user]);
 ```
 
-Use `Core\Security::e()` for output escaping:
+Escape output in templates:
 
 ```php
 <?= \Core\Security::e($user->name) ?>
@@ -151,9 +135,9 @@ Use `Core\Security::e()` for output escaping:
 
 ---
 
-## Models (Eloquent)
+## Models
 
-LaraHub uses [Illuminate Eloquent](https://laravel.com/docs/eloquent). Models go in `app/Models/`:
+Uses [Eloquent](https://laravel.com/docs/eloquent). Models go in `app/Models/`:
 
 ```php
 <?php
@@ -164,7 +148,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Post extends Model
 {
-    protected $table = 'posts';
     protected $fillable = ['title', 'content', 'user_id'];
 
     public function user()
@@ -176,25 +159,9 @@ class Post extends Model
 
 ---
 
-## Migrations
-
-Migrations are in `database/migrations/`. The `make:model` command can create them with useful defaults.
-
-**Blueprint modifiers (in migration comments):**
-- Modifiers: `->after()`, `->nullable()`, `->unique()`, `->index()`, `->default()`
-- Types: `string()`, `text()`, `integer()`, `timestamp()`, `foreignId()`, etc.
-
-**Blameable option:** Add `created_by` and `updated_by` foreign keys:
-
-```bash
-php larahub make:model Article -m -b=users
-```
-
----
-
 ## Middleware
 
-Create middleware in `app/Middlewares/` with a `handle()` method:
+Create in `app/Middlewares/`:
 
 ```php
 <?php
@@ -215,37 +182,35 @@ class AuthMiddleware
 
 ---
 
-## Security
+## Security Tips
 
-- **CSRF protection:** Add `<?= \Core\Security::csrfField() ?>` in forms, then verify with `\Core\Security::verifyCsrf($_POST['csrf'] ?? '')` before processing.
-- **Output escaping:** Use `\Core\Security::e($value)` for user-provided data in views.
-- **APP_KEY:** Stored encrypted in `.env`, decrypted using a master key in `storage/keys/`. Run `php larahub generate:key` after config changes if needed.
-
----
-
-## Configuration
-
-Environment variables (`.env`):
-
-| Variable | Description |
-|----------|-------------|
-| `APP_NAME` | Application name |
-| `APP_ENV` | Environment (local, production, etc.) |
-| `APP_DEBUG` | `true` = debug views, `false` = production error pages |
-| `APP_KEY` | Generated with `php larahub generate:key` |
-| `DB_HOST` | Database host |
-| `DB_NAME` | Database name |
-| `DB_USER` | Database user |
-| `DB_PASS` | Database password |
-| `SESSION_DRIVER` | Session driver (e.g. `file`) |
+- **Forms:** Add `<?= \Core\Security::csrfField() ?>` and verify with `\Core\Security::verifyCsrf($_POST['csrf'] ?? '')`
+- **Output:** Use `\Core\Security::e($value)` for user data in views
+- **APP_KEY:** Auto-generated. Regenerate with `php larahub generate:key` if needed
 
 ---
 
-## Error Handling
+## Environment (.env)
 
-- **Debug mode** (`APP_DEBUG=true`): Stack traces and detailed errors
-- **Production** (`APP_DEBUG=false`): Generic error pages, details logged to `storage/logs/`
-- 404 pages rendered when no route matches
+| Variable | Purpose |
+|----------|---------|
+| `APP_NAME` | App name |
+| `APP_DEBUG` | `true` = detailed errors, `false` = production mode |
+| `APP_KEY` | Auto-generated, keep secret |
+| `DB_HOST`, `DB_NAME`, `DB_USER`, `DB_PASS` | Database connection |
+| `SESSION_DRIVER` | e.g. `file` |
+
+---
+
+## Alternative Install (Clone)
+
+```bash
+git clone https://github.com/larahub/larahub.git my-app
+cd my-app
+composer install
+```
+
+Setup runs automatically on install.
 
 ---
 
