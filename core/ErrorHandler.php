@@ -68,7 +68,7 @@ class ErrorHandler
             header('Content-Type: text/html; charset=UTF-8');
         }
 
-        $debug = filter_var($_ENV['APP_DEBUG'] ?? false, FILTER_VALIDATE_BOOLEAN);
+        $debug = filter_var(env('APP_DEBUG', false), FILTER_VALIDATE_BOOLEAN);
         $view = $debug ? 'debug' : 'production';
 
         $data = [
@@ -79,7 +79,7 @@ class ErrorHandler
             'trace'      => $e->getTrace(),
             'traceAsStr' => $e->getTraceAsString(),
             'code'       => $code,
-            'appName'    => $_ENV['APP_NAME'] ?? 'LaraHub',
+            'appName'    => env('APP_NAME', 'LaraHub'),
         ];
 
         $viewPath = self::$basePath . "/views/errors/{$view}.php";
@@ -98,14 +98,14 @@ class ErrorHandler
             header('Content-Type: text/html; charset=UTF-8');
         }
 
-        $debug = filter_var($_ENV['APP_DEBUG'] ?? false, FILTER_VALIDATE_BOOLEAN);
+        $debug = filter_var(env('APP_DEBUG', false), FILTER_VALIDATE_BOOLEAN);
         $view = $debug ? '404-debug' : '404';
 
         $data = [
             'message' => 'Page not found',
             'uri'     => $_SERVER['REQUEST_URI'] ?? '/',
             'method'  => $_SERVER['REQUEST_METHOD'] ?? 'GET',
-            'appName' => $_ENV['APP_NAME'] ?? 'LaraHub',
+            'appName' => env('APP_NAME', 'LaraHub'),
         ];
 
         $viewPath = self::$basePath . "/views/errors/{$view}.php";

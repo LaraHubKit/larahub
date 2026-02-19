@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($_ENV['APP_NAME'] ?? 'LaraHub') ?> - Lightweight PHP Framework</title>
+    <title><?= htmlspecialchars(env('APP_NAME', 'LaraHub')) ?> - Lightweight PHP Framework</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
@@ -196,7 +196,7 @@
 <body>
     <header class="header">
         <div class="header-inner">
-            <span class="logo"><?= htmlspecialchars($_ENV['APP_NAME'] ?? 'LaraHub') ?></span>
+            <span class="logo"><?= htmlspecialchars(env('APP_NAME', 'LaraHub')) ?></span>
             <span class="badge">PHP 8.1+</span>
         </div>
     </header>

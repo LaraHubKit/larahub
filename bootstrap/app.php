@@ -16,13 +16,16 @@ if (session_status() === PHP_SESSION_NONE) {
 $dotenv = Dotenv::createImmutable($basePath);
 $dotenv->load();
 
+// Helpers (env, config)
+require __DIR__ . '/helpers.php';
+
 // Error handling for web requests (APP_DEBUG: true = debug mode, false = production)
 if (PHP_SAPI !== 'cli') {
     \Core\ErrorHandler::register($basePath);
 }
 
 // Ensure APP_KEY is set for every request
-if (empty($_ENV['APP_KEY'])) {
+if (empty(env('APP_KEY'))) {
     http_response_code(500);
     echo 'Application key is missing. Run: php larahub generate:key';
     exit;
@@ -42,7 +45,7 @@ if (!file_exists($masterPath)) {
 $master = file_get_contents($masterPath);
 
 // Decrypt APP_KEY from .env (encrypted value) to get original key
-$originalKey = AppKey::decrypt(trim($_ENV['APP_KEY']), $master);
+$originalKey = AppKey::decrypt(trim(env('APP_KEY')), $master);
 if ($originalKey === null) {
     http_response_code(500);
     echo 'Invalid or legacy APP_KEY. Run: php larahub generate:key';
@@ -92,10 +95,10 @@ if ($envChanged || $keyMismatch) {
 $capsule = new Capsule;
 $capsule->addConnection([
     'driver'   => 'mysql',
-    'host'     => $_ENV['DB_HOST'],
-    'database' => $_ENV['DB_NAME'],
-    'username' => $_ENV['DB_USER'],
-    'password' => $_ENV['DB_PASS'] ?? '',
+    'host'     => env('DB_HOST'),
+    'database' => env('DB_NAME'),
+    'username' => env('DB_USER'),
+    'password' => env('DB_PASS', ''),
     'charset'  => 'utf8mb4',
     'collation'=> 'utf8mb4_unicode_ci',
 ]);

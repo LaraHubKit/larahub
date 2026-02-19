@@ -1,0 +1,27 @@
+# Environment
+.env
+
+# Dependencies
+/vendor/
+
+# Storage (logs, cache, uploads, keys, public, private)
+/storage/logs/*
+/storage/cache/*
+/storage/uploads/*
+/storage/keys/*
+/storage/public/*
+/storage/private/*
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Misc
+*.log
+.phpunit.result.cache
