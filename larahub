@@ -1,0 +1,109 @@
+<?php
+
+$cmd = $argv[1] ?? null;
+$name = $argv[2] ?? null;
+
+// Parse options from argv (e.g. -m, -b=users)
+$options = [];
+foreach (array_slice($argv, 2) as $arg) {
+    if (preg_match('/^-m$|^--migration$/i', $arg)) {
+        $options['migration'] = true;
+    } elseif (preg_match('/^-b=(.+)$|^--blameable=(.+)$/i', $arg, $m)) {
+        $options['blameable'] = trim($m[1]);
+    } elseif (preg_match('/^--no-blameable$/i', $arg)) {
+        $options['no_blameable'] = true;
+    } elseif (!str_starts_with($arg, '-') && empty($options['model_name'])) {
+        $options['model_name'] = $arg;
+    }
+}
+if ($name && !isset($options['model_name'])) {
+    $options['model_name'] = $name;
+}
+
+// For all CLI commands except key generation, bootstrap the app (and enforce APP_KEY checks)
+if ($cmd !== 'generate:key') {
+    require __DIR__.'/bootstrap/app.php';
+}
+
+switch ($cmd) {
+    case 'run':
+        echo "🚀 LaraHub running at http://localhost:8000\n";
+        passthru("php -S localhost:8000 -t public");
+        break;
+
+    case 'migrate':
+        $files = glob(__DIR__.'/database/migrations/*.php') ?: [];
+        sort($files);
+        foreach ($files as $file) {
+            $migration = require $file;
+            if (is_object($migration) && method_exists($migration, 'up')) {
+                $migration->up();
+            }
+        }
+        echo "✅ Migrations done\n";
+        break;
+
+    case 'make:model':
+        $modelName = $options['model_name'] ?? $name ?? null;
+        if (!$modelName) {
+            die("❌ Model name missing. Usage: php larahub make:model ModelName [-m|--migration] [-b=users|--blameable=users] [--no-blameable]\n");
+        }
+        try {
+            $created = (new \Core\MakeModel(__DIR__, $modelName, $options))->run();
+            foreach ($created as $f) {
+                echo "✅ Created: " . str_replace(__DIR__ . \DIRECTORY_SEPARATOR, '', str_replace('\\', '/', $f)) . "\n";
+            }
+        } catch (\Throwable $e) {
+            die("❌ " . $e->getMessage() . "\n");
+        }
+        break;
+
+    case 'make:controller':
+        if (!$name) die("❌ Name missing\n");
+        $path = __DIR__."/app/Controllers/$name.php";
+        if (file_exists($path)) die("❌ Exists\n");
+
+        $tpl = "<?php\n\nnamespace App\Controllers;\n\nuse Core\Controller;\n\nclass $name extends Controller {\n    public function index(){ return \$this->view('home'); }\n}\n";
+        file_put_contents($path, $tpl);
+        echo "✅ Controller created\n";
+        break;
+
+    case 'generate:key':
+        require __DIR__.'/vendor/autoload.php';
+        $basePath = __DIR__;
+        $envPath = $basePath.'/.env';
+        if (!file_exists($envPath)) {
+            die("❌ .env file not found\n");
+        }
+
+        $key = bin2hex(random_bytes(32));
+        $master = \Core\AppKey::getOrCreateMasterKey($basePath);
+        $encrypted = \Core\AppKey::encrypt($key, $master);
+        $keyHash = \Core\AppKey::hashKey($key);
+
+        $env = file_get_contents($envPath);
+        if (preg_match('/^APP_KEY=.*$/m', $env)) {
+            $env = preg_replace('/^APP_KEY=.*$/m', 'APP_KEY='.$encrypted, $env);
+        } else {
+            $env = "APP_KEY={$encrypted}\n".$env;
+        }
+        file_put_contents($envPath, $env);
+
+        $keyFile = \Core\AppKey::storagePath($basePath);
+        if (!is_dir(dirname($keyFile))) {
+            mkdir(dirname($keyFile), 0777, true);
+        }
+        file_put_contents($keyFile, $keyHash);
+        file_put_contents(\Core\AppKey::envSignaturePath($basePath), \Core\AppKey::envSignature($envPath));
+
+        echo "✅ APP_KEY generated (encrypted in .env, hash in storage)\n";
+        break;
+
+    default:
+        echo "LaraHub CLI\n";
+        echo "php larahub run\n";
+        echo "php larahub migrate\n";
+        echo "php larahub make:controller Name\n";
+        echo "php larahub make:model Name [-m] [-b=users] [--no-blameable]\n";
+        echo "php larahub generate:key\n";
+}
