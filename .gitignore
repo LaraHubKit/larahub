@@ -11,6 +11,7 @@
 /storage/keys/*
 /storage/public/*
 /storage/private/*
+/storage/framework/views/*
 
 # IDE
 .idea/

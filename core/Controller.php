@@ -2,11 +2,12 @@
 namespace Core;
 
 class Controller {
+    protected const VIEW_EXT = '.hub.php';
+
     protected function view($path, $data = []) {
-        extract($data);
-        ob_start();
-        require __DIR__ . "/../views/$path.php";
-        return ob_get_clean();
+        $basePath = dirname(__DIR__);
+        $compiler = new ViewCompiler($basePath);
+        return $compiler->render($path, $data);
     }
 
     protected function json($data) {

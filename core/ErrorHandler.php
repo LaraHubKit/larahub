@@ -82,7 +82,7 @@ class ErrorHandler
             'appName'    => env('APP_NAME', 'LaraHub'),
         ];
 
-        $viewPath = self::$basePath . "/views/errors/{$view}.php";
+        $viewPath = self::$basePath . "/views/errors/{$view}.hub.php";
         if (file_exists($viewPath)) {
             extract($data);
             require $viewPath;
@@ -108,7 +108,7 @@ class ErrorHandler
             'appName' => env('APP_NAME', 'LaraHub'),
         ];
 
-        $viewPath = self::$basePath . "/views/errors/{$view}.php";
+        $viewPath = self::$basePath . "/views/errors/{$view}.hub.php";
         if (file_exists($viewPath)) {
             extract($data);
             require $viewPath;

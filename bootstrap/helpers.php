@@ -73,3 +73,32 @@ if (!function_exists('config')) {
         return $value;
     }
 }
+
+/**
+ * Template helpers for .hub.php views (description.txt)
+ */
+if (!function_exists('asset')) {
+    function asset(string $path): string {
+        $path = ltrim($path, '/');
+        return '/' . $path;
+    }
+}
+
+if (!function_exists('route')) {
+    function route(string $name, array $params = []): string {
+        // Placeholder: Router doesn't support named routes yet
+        return '#';
+    }
+}
+
+if (!function_exists('lh_asset')) {
+    function lh_asset(string $path): string {
+        return asset($path);
+    }
+}
+
+if (!function_exists('lh_route')) {
+    function lh_route(string $name): string {
+        return route($name);
+    }
+}

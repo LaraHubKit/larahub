@@ -331,7 +331,7 @@ return $this->json(['status' => 'ok']);
         <section class="section">
             <h2 class="section-title">Views</h2>
             <div class="card card-large">
-                <p>Views live in <code>views/</code> as <code>.php</code> files. Pass data via the second argument of <code>view()</code>. Use <code>\Core\Security::e()</code> for output escaping.</p>
+                <p>Views live in <code>views/</code> as <code>.hub.php</code> templates. Pass data via the second argument of <code>view()</code>. Use <code>\Core\Security::e()</code> for output escaping.</p>
             </div>
         </section>
 

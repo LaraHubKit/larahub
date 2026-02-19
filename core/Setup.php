@@ -3,7 +3,7 @@
 $basePath = __DIR__ . '/..';
 
 // storage + database folders (create at project creation)
-$dirs = ['storage/logs','storage/cache','storage/uploads','storage/keys','storage/public','storage/private','database','database/migrations'];
+$dirs = ['storage/logs','storage/cache','storage/uploads','storage/keys','storage/public','storage/private','storage/framework/views','database','database/migrations'];
 foreach ($dirs as $dir) {
     if (!is_dir($basePath . '/' . $dir)) {
         mkdir($basePath . '/' . $dir, 0777, true);

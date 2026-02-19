@@ -53,6 +53,7 @@ Open **http://localhost:8000** in your browser.
 | `php larahub migrate` | Run migrations |
 | `php larahub migrate:fresh` | Drop tables and re-run migrations |
 | `php larahub make:controller Name` | Create a controller |
+| `php larahub make:view name` | Create a .hub.php view (use dots: users.profile) |
 | `php larahub make:model Name` | Create a model |
 | `php larahub make:model Name -m` | Create model + migration |
 | `php larahub make:model Name -m -b=users` | Model + migration + blameable (created_by, updated_by) |
@@ -74,7 +75,7 @@ my-app/
 │   ├── web.php        # Web routes
 │   └── api.php        # API routes
 ├── storage/           # Logs, cache, uploads, keys
-├── views/             # HTML templates
+├── views/             # .hub.php view templates
 └── larahub            # CLI tool
 ```
 
@@ -121,7 +122,7 @@ class HomeController extends Controller
 
 ## Views
 
-Views are PHP files in `views/`. Use dots for subfolders: `users.profile` → `views/users/profile.php`.
+Views are `.hub.php` template files in `views/`. Use dots for subfolders: `users.profile` → `views/users/profile.hub.php`.
 
 ```php
 return $this->view('home', ['user' => $user]);
